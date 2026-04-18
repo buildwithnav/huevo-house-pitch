@@ -18,6 +18,8 @@ html, body {
 html {
     scroll-snap-type: y mandatory;
     scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: none;
 }
 .slide {
     width: 100vw;
@@ -807,6 +809,23 @@ td.good { color: var(--green-good); font-weight: 500; }
     const progress = document.getElementById('progress');
     const counter = document.getElementById('slideCounter');
     const total = slides.length;
+    let currentSlide = 0;
+    let isScrolling = false;
+
+    /* Determine current slide from scroll position */
+    function getCurrentSlide() {
+        const vh = window.innerHeight;
+        return Math.round(window.scrollY / vh);
+    }
+
+    /* Navigate to a specific slide */
+    function goToSlide(index) {
+        if (index < 0 || index >= total || isScrolling) return;
+        isScrolling = true;
+        currentSlide = index;
+        slides[index].scrollIntoView({ behavior: 'smooth' });
+        setTimeout(() => { isScrolling = false; }, 600);
+    }
 
     /* Reveal on scroll */
     const observer = new IntersectionObserver((entries) => {
@@ -817,7 +836,7 @@ td.good { color: var(--green-good); font-weight: 500; }
                 });
             }
         });
-    }, { threshold: 0.3 });
+    }, { threshold: 0.2 });
 
     slides.forEach(s => observer.observe(s));
 
@@ -828,49 +847,63 @@ td.good { color: var(--green-good); font-weight: 500; }
         const pct = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
         progress.style.width = pct + '%';
 
-        const current = Math.round((scrollTop / scrollHeight) * (total - 1)) + 1;
-        counter.textContent = Math.min(current, total) + ' / ' + total;
+        currentSlide = getCurrentSlide();
+        counter.textContent = Math.min(currentSlide + 1, total) + ' / ' + total;
     }
     window.addEventListener('scroll', updateProgress);
     updateProgress();
 
     /* Keyboard navigation */
     document.addEventListener('keydown', (e) => {
-        const scrollTop = window.scrollY;
-        const vh = window.innerHeight;
-        const currentIndex = Math.round(scrollTop / vh);
-
         if (e.key === 'ArrowDown' || e.key === ' ' || e.key === 'PageDown') {
             e.preventDefault();
-            const next = Math.min(currentIndex + 1, total - 1);
-            slides[next].scrollIntoView({ behavior: 'smooth' });
+            goToSlide(getCurrentSlide() + 1);
         }
         if (e.key === 'ArrowUp' || e.key === 'PageUp') {
             e.preventDefault();
-            const prev = Math.max(currentIndex - 1, 0);
-            slides[prev].scrollIntoView({ behavior: 'smooth' });
+            goToSlide(getCurrentSlide() - 1);
         }
     });
 
-    /* Touch navigation */
+    /* Touch navigation — swipe with lower threshold for mobile */
     let touchStartY = 0;
-    document.addEventListener('touchstart', (e) => { touchStartY = e.touches[0].clientY; });
+    let touchStartTime = 0;
+
+    document.addEventListener('touchstart', (e) => {
+        touchStartY = e.touches[0].clientY;
+        touchStartTime = Date.now();
+    }, { passive: true });
+
     document.addEventListener('touchend', (e) => {
         const diff = touchStartY - e.changedTouches[0].clientY;
-        const scrollTop = window.scrollY;
-        const vh = window.innerHeight;
-        const currentIndex = Math.round(scrollTop / vh);
+        const elapsed = Date.now() - touchStartTime;
 
-        if (Math.abs(diff) > 50) {
+        /* Only handle quick swipes (under 400ms), let natural scroll handle slow drags */
+        if (elapsed > 400) return;
+
+        if (Math.abs(diff) > 30) {
+            e.preventDefault();
             if (diff > 0) {
-                const next = Math.min(currentIndex + 1, total - 1);
-                slides[next].scrollIntoView({ behavior: 'smooth' });
+                goToSlide(getCurrentSlide() + 1);
             } else {
-                const prev = Math.max(currentIndex - 1, 0);
-                slides[prev].scrollIntoView({ behavior: 'smooth' });
+                goToSlide(getCurrentSlide() - 1);
             }
         }
-    });
+    }, { passive: false });
+
+    /* Mouse wheel — one slide per scroll event */
+    let wheelTimeout = null;
+    document.addEventListener('wheel', (e) => {
+        if (wheelTimeout) return;
+        e.preventDefault();
+        wheelTimeout = setTimeout(() => { wheelTimeout = null; }, 800);
+
+        if (e.deltaY > 0) {
+            goToSlide(getCurrentSlide() + 1);
+        } else {
+            goToSlide(getCurrentSlide() - 1);
+        }
+    }, { passive: false });
 })();
 </script>
 
