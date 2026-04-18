@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Huevo House — Santa Clarita Expansion</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ===========================================
+   VIEWPORT FITTING: MANDATORY BASE STYLES
+   =========================================== */
+html, body {
+    height: 100%;
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+}
+html {
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+}
+.slide {
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+.slide-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-height: 100%;
+    overflow: hidden;
+    padding: var(--slide-padding);
+}
+:root {
+    --title-size: clamp(1.5rem, 5vw, 4rem);
+    --h2-size: clamp(1.25rem, 3.5vw, 2.5rem);
+    --h3-size: clamp(1rem, 2.5vw, 1.75rem);
+    --body-size: clamp(0.75rem, 1.5vw, 1.125rem);
+    --small-size: clamp(0.65rem, 1vw, 0.875rem);
+    --slide-padding: clamp(1rem, 4vw, 4rem);
+    --content-gap: clamp(0.5rem, 2vw, 2rem);
+    --element-gap: clamp(0.25rem, 1vw, 1rem);
+
+    /* Huevo House Theme */
+    --bg-deep: #0C0804;
+    --bg-warm: #1A1008;
+    --bg-card: #231810;
+    --yolk: #F5B731;
+    --yolk-light: #FADA7A;
+    --yolk-glow: rgba(245, 183, 49, 0.15);
+    --cream: #FDF6E8;
+    --text-body: #C9B99A;
+    --text-muted: #8A7560;
+    --green-good: #5AAF4C;
+    --red-accent: #E05B45;
+    --font-display: 'Cormorant Garamond', serif;
+    --font-body: 'Space Grotesk', sans-serif;
+}
+@media (max-height: 700px) {
+    :root {
+        --slide-padding: clamp(0.75rem, 3vw, 2rem);
+        --content-gap: clamp(0.4rem, 1.5vw, 1rem);
+        --title-size: clamp(1.25rem, 4.5vw, 2.5rem);
+        --h2-size: clamp(1rem, 3vw, 1.75rem);
+    }
+}
+@media (max-height: 600px) {
+    :root {
+        --slide-padding: clamp(0.5rem, 2.5vw, 1.5rem);
+        --content-gap: clamp(0.3rem, 1vw, 0.75rem);
+        --title-size: clamp(1.1rem, 4vw, 2rem);
+        --body-size: clamp(0.7rem, 1.2vw, 0.95rem);
+    }
+    .nav-dots, .keyboard-hint { display: none; }
+}
+@media (max-height: 500px) {
+    :root {
+        --slide-padding: clamp(0.4rem, 2vw, 1rem);
+        --title-size: clamp(1rem, 3.5vw, 1.5rem);
+        --h2-size: clamp(0.9rem, 2.5vw, 1.25rem);
+        --body-size: clamp(0.65rem, 1vw, 0.85rem);
+    }
+}
+@media (max-width: 600px) {
+    :root { --title-size: clamp(1.25rem, 7vw, 2.5rem); }
+    .grid { grid-template-columns: 1fr !important; }
+    .split { flex-direction: column !important; }
+    .split > * { width: 100% !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.2s !important;
+    }
+    html { scroll-behavior: auto; }
+}
+
+/* ===========================================
+   THEME
+   =========================================== */
+body {
+    font-family: var(--font-body);
+    background: var(--bg-deep);
+    color: var(--cream);
+    -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3 {
+    font-family: var(--font-display);
+    font-weight: 300;
+    line-height: 1.15;
+    margin: 0;
+}
+h1 { font-size: var(--title-size); }
+h2 { font-size: var(--h2-size); }
+h3 { font-size: var(--h3-size); }
+p { font-size: var(--body-size); line-height: 1.6; margin: 0; color: var(--text-body); }
+
+/* Egg accent */
+.egg-icon {
+    display: inline-block;
+    width: clamp(40px, 5vw, 70px);
+    height: clamp(50px, 6vw, 85px);
+    background: radial-gradient(ellipse at 45% 40%, var(--yolk) 28%, var(--cream) 29%, var(--cream) 100%);
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    margin-bottom: var(--element-gap);
+}
+.yolk { color: var(--yolk); }
+.yolk-light { color: var(--yolk-light); }
+
+/* Eyebrow */
+.eyebrow {
+    font-family: var(--font-body);
+    font-size: var(--small-size);
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--yolk);
+    margin-bottom: clamp(0.5rem, 1vh, 1rem);
+}
+
+/* Divider */
+.gold-line {
+    width: clamp(60px, 10vw, 120px);
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--yolk), transparent);
+    margin: clamp(0.5rem, 1.5vh, 1.5rem) 0;
+}
+.gold-line-center { margin-left: auto; margin-right: auto; }
+
+/* Cards */
+.card {
+    background: var(--bg-card);
+    border: 1px solid rgba(245, 183, 49, 0.12);
+    padding: clamp(0.75rem, 2vw, 1.5rem);
+    border-radius: 2px;
+}
+
+/* Stat block */
+.stat {
+    text-align: center;
+}
+.stat-number {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 4vw, 3.5rem);
+    font-weight: 300;
+    color: var(--yolk);
+    line-height: 1;
+}
+.stat-label {
+    font-size: var(--small-size);
+    color: var(--text-muted);
+    margin-top: clamp(0.2rem, 0.5vh, 0.5rem);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+/* Table */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--body-size);
+}
+th {
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: var(--small-size);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--yolk);
+    text-align: left;
+    padding: clamp(0.3rem, 0.8vh, 0.6rem) clamp(0.4rem, 1vw, 1rem);
+    border-bottom: 1px solid rgba(245, 183, 49, 0.25);
+}
+td {
+    color: var(--text-body);
+    padding: clamp(0.3rem, 0.8vh, 0.6rem) clamp(0.4rem, 1vw, 1rem);
+    border-bottom: 1px solid rgba(138, 117, 96, 0.12);
+}
+td.highlight { color: var(--yolk); font-weight: 500; }
+td.good { color: var(--green-good); font-weight: 500; }
+
+/* Split layout */
+.split {
+    display: flex;
+    gap: clamp(1rem, 3vw, 3rem);
+    align-items: center;
+}
+.split > * { flex: 1; }
+
+/* Grid */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+    gap: clamp(0.5rem, 1.5vw, 1rem);
+}
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+/* Score badge */
+.score-ring {
+    width: clamp(100px, 15vw, 160px);
+    height: clamp(100px, 15vw, 160px);
+    border-radius: 50%;
+    border: 3px solid var(--yolk);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 40px var(--yolk-glow), inset 0 0 30px var(--yolk-glow);
+    flex-shrink: 0;
+}
+.score-ring .number {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 4rem);
+    font-weight: 300;
+    color: var(--yolk);
+    line-height: 1;
+}
+.score-ring .label {
+    font-size: var(--small-size);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+}
+
+/* Tag */
+.tag {
+    display: inline-block;
+    font-size: var(--small-size);
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: clamp(0.2rem, 0.4vh, 0.3rem) clamp(0.5rem, 1vw, 0.8rem);
+    border-radius: 2px;
+    background: rgba(245, 183, 49, 0.15);
+    color: var(--yolk);
+    border: 1px solid rgba(245, 183, 49, 0.3);
+}
+.tag-green {
+    background: rgba(90, 175, 76, 0.15);
+    color: var(--green-good);
+    border-color: rgba(90, 175, 76, 0.3);
+}
+
+/* Ambient circles */
+.ambient {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    filter: blur(80px);
+    opacity: 0.08;
+    z-index: 0;
+}
+.slide-content { position: relative; z-index: 1; }
+
+/* Progress bar */
+.progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--yolk), var(--yolk-light));
+    z-index: 9999;
+    transition: width 0.3s ease;
+}
+
+/* Slide counter */
+.slide-counter {
+    position: fixed;
+    bottom: clamp(1rem, 2vh, 2rem);
+    right: clamp(1rem, 2vw, 2rem);
+    font-family: var(--font-body);
+    font-size: var(--small-size);
+    color: var(--text-muted);
+    z-index: 999;
+}
+
+/* Reveal animations */
+.reveal-item {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal-item.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+.reveal-item:nth-child(2) { transition-delay: 0.1s; }
+.reveal-item:nth-child(3) { transition-delay: 0.2s; }
+.reveal-item:nth-child(4) { transition-delay: 0.3s; }
+.reveal-item:nth-child(5) { transition-delay: 0.4s; }
+.reveal-item:nth-child(6) { transition-delay: 0.5s; }
+
+/* Centered content helper */
+.centered { text-align: center; align-items: center; }
+
+/* Background variations */
+.bg-warm { background: var(--bg-warm); }
+.bg-deep { background: var(--bg-deep); }
+.bg-gradient {
+    background: linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-warm) 100%);
+}
+
+/* Bullet list */
+.check-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(0.3rem, 0.8vh, 0.6rem);
+}
+.check-list li {
+    font-size: var(--body-size);
+    color: var(--text-body);
+    padding-left: 1.5em;
+    position: relative;
+}
+.check-list li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--yolk);
+    font-weight: 600;
+}
+</style>
+</head>
+<body>
+
+<!-- Progress bar -->
+<div class="progress" id="progress"></div>
+<div class="slide-counter" id="slideCounter"></div>
+
+<!-- ============================================
+     SLIDE 1: TITLE
+     ============================================ -->
+<section class="slide bg-deep centered" id="slide-1">
+    <div class="ambient" style="width:400px;height:400px;background:var(--yolk);top:-100px;right:-100px;"></div>
+    <div class="ambient" style="width:300px;height:300px;background:var(--yolk);bottom:-80px;left:-80px;"></div>
+    <div class="slide-content centered">
+        <img src="assets/huevo-house-logo.png" alt="Huevo House Cafe logo" class="reveal-item" style="width:clamp(120px,20vw,220px);height:auto;margin:0 auto clamp(0.5rem,1.5vh,1.5rem);">
+        <div class="gold-line gold-line-center reveal-item"></div>
+        <p class="reveal-item" style="font-size:var(--h3-size);font-family:var(--font-display);font-weight:300;font-style:italic;color:var(--cream);">
+            Santa Clarita Expansion
+        </p>
+        <p class="reveal-item" style="margin-top:var(--content-gap);color:var(--text-muted);">
+            Investor Presentation &mdash; April 2026
+        </p>
+    </div>
+</section>
+
+<!-- ============================================
+     SLIDE 2: THE CONCEPT
+     ============================================ -->
+<section class="slide bg-warm" id="slide-2">
+    <div class="ambient" style="width:350px;height:350px;background:var(--yolk);bottom:-120px;right:10%;"></div>
+    <div class="slide-content">
+        <div class="eyebrow reveal-item">The Concept</div>
+        <h2 class="reveal-item">The Hispanic Community's <em class="yolk" style="font-style:italic;">Denny's</em></h2>
+        <div class="gold-line reveal-item"></div>
+        <div class="split reveal-item" style="margin-top:var(--content-gap);">
+            <div>
+                <p style="margin-bottom:var(--element-gap);">
+                    American breakfast done right — steak & eggs, pancakes, waffles, chicken fried steak — with authentic Mexican soul woven in. House-made red and green salsas, chilaquiles, birria omelets, huevos rancheros.
+                </p>
+                <p>
+                    The interior is quirky and Instagrammable — egg puns everywhere, playful decor, modern energy. Not a Mexican restaurant. Not a generic diner. A place that feels like home for Hispanic families and welcoming to everyone.
+                </p>
+            </div>
+            <div class="card" style="text-align:center;">
+                <div style="font-size:clamp(2rem,4vw,3.5rem);margin-bottom:0.3rem;">🍳</div>
+                <h3 style="color:var(--yolk);margin-bottom:0.5rem;">Real Mexican Ladies</h3>
+                <p style="font-size:var(--small-size);">Our prep team makes everything from scratch — salsas, sauces, tortillas. That's the difference.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SLIDE 3: PROVEN TRACK RECORD
+     ============================================ -->
+<section class="slide bg-deep" id="slide-3">
+    <div class="ambient" style="width:300px;height:300px;background:var(--yolk);top:20%;left:-100px;"></div>
+    <div class="slide-content">
+        <div class="eyebrow reveal-item">Proven Track Record</div>
+        <h2 class="reveal-item">2 Profitable Locations in <em class="yolk" style="font-style:italic;">Bakersfield</em></h2>
+        <div class="gold-line reveal-item"></div>
+        <div class="grid grid-4 reveal-item" style="margin-top:var(--content-gap);">
+            <div class="stat">
+                <div class="stat-number">$115K</div>
+                <div class="stat-label">Monthly Sales<br>Ming Ave</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">$67K</div>
+                <div class="stat-label">Monthly Sales<br>Downtown</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">$23</div>
+                <div class="stat-label">Revenue per<br>Sq Ft / Month</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">377</div>
+                <div class="stat-label">Combined<br>Yelp Reviews</div>
+            </div>
+        </div>
+        <div class="card reveal-item" style="margin-top:var(--content-gap);text-align:center;">
+            <p><span class="yolk" style="font-weight:500;">Key Insight:</span> Revenue per square foot is consistent across both locations (~$23/sf). This is a <strong style="color:var(--cream);">repeatable operating model</strong>, not a one-location fluke.</p>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SLIDE 4: THE LOCATION
+     ============================================ -->
+<section class="slide bg-warm" id="slide-4">
+    <div class="ambient" style="width:400px;height:400px;background:var(--yolk);top:-80px;right:-120px;"></div>
+    <div class="slide-content">
+        <div class="eyebrow reveal-item">The Location</div>
+        <h2 class="reveal-item">26509 Golden Valley Rd, <em class="yolk" style="font-style:italic;">Santa Clarita</em></h2>
+        <div class="gold-line reveal-item"></div>
+        <div class="grid grid-3 reveal-item" style="margin-top:var(--content-gap);">
+            <div class="card">
+                <h3 class="yolk" style="font-size:var(--body-size);font-family:var(--font-body);font-weight:500;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.5rem;">The Space</h3>
+                <p style="font-size:var(--small-size);">2,600 sq ft indoor<br>2,000 sq ft patio<br><strong style="color:var(--cream);">4,600 sq ft total</strong><br>90-100 seats<br>Corner property — <strong style="color:var(--cream);">2 street signs</strong></p>
+            </div>
+            <div class="card">
+                <h3 class="yolk" style="font-size:var(--body-size);font-family:var(--font-body);font-weight:500;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.5rem;">The Kitchen</h3>
+                <p style="font-size:var(--small-size);">Full commercial kitchen<br>Walk-in cooler & freezer<br>$750K+ original buildout<br><strong style="color:var(--cream);">All equipment functional</strong></p>
+            </div>
+            <div class="card">
+                <h3 class="yolk" style="font-size:var(--body-size);font-family:var(--font-body);font-weight:500;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.5rem;">The Bar</h3>
+                <p style="font-size:var(--small-size);">Full long bar top with seating<br>36 beer taps ready to go<br>Beer & Wine license (Type 41)<br><strong style="color:var(--cream);">Micheladas & mimosas day 1</strong></p>
+            </div>
+        </div>
+        <div class="grid grid-3 reveal-item" style="margin-top:var(--element-gap);">
+            <div class="card" style="text-align:center;">
+                <p style="font-size:var(--small-size);"><span class="yolk" style="font-weight:500;">$10,318/mo</span> rent (NNN)</p>
+            </div>
+            <div class="card" style="text-align:center;">
+                <p style="font-size:var(--small-size);"><span class="yolk" style="font-weight:500;">11 years</span> lease remaining</p>
+            </div>
+            <div class="card" style="text-align:center;">
+                <p style="font-size:var(--small-size);color:var(--green-good);font-weight:500;">Landlord wants us</p>
+            </div>
+        </div>
+        <div class="card reveal-item" style="margin-top:var(--element-gap);text-align:center;">
+            <p style="font-size:var(--small-size);margin-bottom:clamp(0.2rem,0.5vh,0.4rem);"><span class="yolk" style="font-weight:500;">Centre Pointe Marketplace</span> — 100,000 SF Power Center</p>
+            <p style="font-size:var(--small-size);line-height:1.8;">
+                Rattler's BBQ <span style="color:var(--text-muted);">(next door, 1,200+ reviews, est. 1988)</span> &bull;
+                LA Fitness &bull; Walmart Supercenter &bull; Sam's Club &bull;
+                Dick's Sporting Goods &bull; Starbucks &bull; Jersey Mike's &bull;
+                Bank of America &bull; Spectrum &bull; Joann Fabrics &bull; Ashley Furniture
+            </p>
+            <p style="font-size:var(--small-size);color:var(--yolk);margin-top:clamp(0.2rem,0.5vh,0.4rem);font-weight:500;">Corner property with dual street signage &bull; High daily foot traffic from national anchors</p>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SLIDE 4B: PROPERTY PHOTOS
+     ============================================ -->
+<section class="slide bg-deep" id="slide-4b">
+    <div class="ambient" style="width:350px;height:350px;background:var(--yolk);bottom:-120px;left:-80px;"></div>
+    <div class="slide-content">
+        <div class="eyebrow reveal-item">The Space</div>
+        <h2 class="reveal-item">Turnkey &mdash; <em class="yolk" style="font-style:italic;">Ready to Go</em></h2>
+        <div class="gold-line reveal-item"></div>
+        <div class="reveal-item" style="margin-top:var(--content-gap);display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(2,1fr);gap:clamp(4px,0.5vw,8px);max-height:min(58vh,500px);">
+            <div style="position:relative;overflow:hidden;border:1px solid rgba(245,183,49,0.15);">
+                <img src="assets/backyard-1.jpg" alt="Exterior — corner property with dual signage" style="width:100%;height:100%;object-fit:cover;">
+                <div style="position:absolute;bottom:0;left:0;right:0;padding:4px 8px;background:rgba(12,8,4,0.85);font-size:var(--small-size);color:var(--yolk);font-weight:500;">Corner Property — Signs on Both Streets</div>
+            </div>
+            <div style="position:relative;overflow:hidden;border:1px solid rgba(245,183,49,0.15);grid-column:span 2;">
+                <img src="assets/backyard-2.jpg" alt="2,000 sq ft outdoor patio with seating" style="width:100%;height:100%;object-fit:cover;">
+                <div style="position:absolute;bottom:0;left:0;right:0;padding:4px 8px;background:rgba(12,8,4,0.85);font-size:var(--small-size);color:var(--yolk);font-weight:500;">2,000 Sq Ft Patio — Permitted for Alcohol</div>
+            </div>
+            <div style="position:relative;overflow:hidden;border:1px solid rgba(245,183,49,0.15);">
+                <img src="assets/backyard-3.jpg" alt="Dining area — bar seating" style="width:100%;height:100%;object-fit:cover;">
+                <div style="position:absolute;bottom:0;left:0;right:0;padding:4px 8px;background:rgba(12,8,4,0.85);font-size:var(--small-size);color:var(--yolk);font-weight:500;">Dining + Bar</div>
+            </div>
+            <div style="position:relative;overflow:hidden;border:1px solid rgba(245,183,49,0.15);">
+                <img src="assets/backyard-4.jpg" alt="Full bar with 36 taps" style="width:100%;height:100%;object-fit:cover;">
+                <div style="position:absolute;bottom:0;left:0;right:0;padding:4px 8px;background:rgba(12,8,4,0.85);font-size:var(--small-size);color:var(--yolk);font-weight:500;">36 Beer Taps</div>
+            </div>
+            <div style="position:relative;overflow:hidden;border:1px solid rgba(245,183,49,0.15);">
+                <img src="assets/backyard-8.jpg" alt="Full commercial kitchen" style="width:100%;height:100%;object-fit:cover;">
+                <div style="position:absolute;bottom:0;left:0;right:0;padding:4px 8px;background:rgba(12,8,4,0.85);font-size:var(--small-size);color:var(--yolk);font-weight:500;">Commercial Kitchen</div>
+            </div>
+            <div style="position:relative;overflow:hidden;border:1px solid rgba(245,183,49,0.15);">
+                <img src="assets/backyard-7.jpg" alt="Walk-in cooler and freezer" style="width:100%;height:100%;object-fit:cover;">
+                <div style="position:absolute;bottom:0;left:0;right:0;padding:4px 8px;background:rgba(12,8,4,0.85);font-size:var(--small-size);color:var(--yolk);font-weight:500;">Walk-in Cooler & Freezer</div>
+            </div>
+            <div style="position:relative;overflow:hidden;border:1px solid rgba(245,183,49,0.15);">
+                <img src="assets/backyard-16.jpg" alt="Bar area with seating" style="width:100%;height:100%;object-fit:cover;">
+                <div style="position:absolute;bottom:0;left:0;right:0;padding:4px 8px;background:rgba(12,8,4,0.85);font-size:var(--small-size);color:var(--yolk);font-weight:500;">Bar Seating Area</div>
+            </div>
+        </div>
+        <p class="reveal-item" style="text-align:center;margin-top:var(--element-gap);font-size:var(--small-size);color:var(--text-muted);">
+            $750K+ buildout &bull; All equipment functional &bull; HVAC in great shape &bull; Walk-in cooler & freezer
+        </p>
+    </div>
+</section>
+
+<!-- ============================================
+     SLIDE 5: WHY SANTA CLARITA
+     ============================================ -->
+<section class="slide bg-deep" id="slide-5">
+    <div class="ambient" style="width:350px;height:350px;background:var(--yolk);bottom:-100px;left:20%;"></div>
+    <div class="slide-content">
+        <div class="eyebrow reveal-item">Market Analysis</div>
+        <h2 class="reveal-item">Why <em class="yolk" style="font-style:italic;">Santa Clarita</em></h2>
+        <div class="gold-line reveal-item"></div>
+        <div class="split reveal-item" style="margin-top:var(--content-gap);">
+            <div>
+                <div class="grid" style="grid-template-columns:1fr 1fr;gap:clamp(0.5rem,1vw,1rem);">
+                    <div class="stat">
+                        <div class="stat-number">230K+</div>
+                        <div class="stat-label">Population</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">36%</div>
+                        <div class="stat-label">Hispanic</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">$140K</div>
+                        <div class="stat-label">Median Income</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">76%</div>
+                        <div class="stat-label">Family Households</div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="card" style="margin-bottom:var(--element-gap);">
+                    <p style="font-size:var(--small-size);"><span class="yolk" style="font-weight:500;">82% higher income</span> than Bakersfield ($140K vs $77K). Customers will pay more and tip better.</p>
+                </div>
+                <div class="card" style="margin-bottom:var(--element-gap);">
+                    <p style="font-size:var(--small-size);"><span class="yolk" style="font-weight:500;">Zero competition</span> — no modern Hispanic-angle breakfast concept exists in the entire Santa Clarita Valley.</p>
+                </div>
+                <div class="card">
+                    <p style="font-size:var(--small-size);"><span class="yolk" style="font-weight:500;">Family market</span> — 76% family households, median age 38. Breakfast is a family occasion.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SLIDE 6: COMPETITIVE LANDSCAPE
+     ============================================ -->
+<section class="slide bg-warm" id="slide-6">
+    <div class="ambient" style="width:300px;height:300px;background:var(--yolk);top:-80px;left:-80px;"></div>
+    <div class="slide-content">
+        <div class="eyebrow reveal-item">Competition</div>
+        <h2 class="reveal-item">The Gap Is <em class="yolk" style="font-style:italic;">Wide Open</em></h2>
+        <div class="gold-line reveal-item"></div>
+        <div class="reveal-item" style="margin-top:var(--content-gap);">
+            <table>
+                <thead>
+                    <tr><th>Competitor</th><th>Type</th><th>Reviews</th><th>Threat</th><th>Our Edge</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td style="color:var(--cream);">Egg Plantation</td><td>Diner (est. 1973)</td><td>2,414</td><td class="highlight">HIGH</td><td>Stale, no Mexican angle, long waits</td></tr>
+                    <tr><td style="color:var(--cream);">IHOP</td><td>Chain</td><td>200</td><td class="good">LOW</td><td>Generic, no personality</td></tr>
+                    <tr><td style="color:var(--cream);">Denny's</td><td>Chain (30+ yrs)</td><td>~150</td><td class="good">LOW</td><td>Declining brand</td></tr>
+                    <tr><td style="color:var(--cream);">Las Delicias</td><td>Taqueria</td><td>~100</td><td class="highlight">MED</td><td>Different positioning entirely</td></tr>
+                    <tr><td style="color:var(--cream);">Flying Yolk</td><td>Trendy brunch</td><td>~200</td><td class="highlight">MED</td><td>Different price point & vibe</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SLIDE 7: INVESTMENT
+     ============================================ -->
+<section class="slide bg-deep" id="slide-7">
+    <div class="ambient" style="width:400px;height:400px;background:var(--yolk);bottom:0;right:-150px;"></div>
+    <div class="slide-content">
+        <div class="eyebrow reveal-item">Investment</div>
+        <h2 class="reveal-item">Cosmetic Conversion <em class="yolk" style="font-style:italic;">Only</em></h2>
+        <div class="gold-line reveal-item"></div>
+        <div class="split reveal-item" style="margin-top:var(--content-gap);">
+            <div>
+                <table>
+                    <thead><tr><th>Item</th><th style="text-align:right;">Cost</th></tr></thead>
+                    <tbody>
+                        <tr><td style="color:var(--cream);">Asset purchase (FF&E, license)</td><td style="text-align:right;" class="highlight">$110,000</td></tr>
+                        <tr><td>Wall art, egg decor, signage</td><td style="text-align:right;">$12,000</td></tr>
+                        <tr><td>Menus, plates, smallwares</td><td style="text-align:right;">$7,000</td></tr>
+                        <tr><td>Patio umbrellas + mist fans</td><td style="text-align:right;">$4,000</td></tr>
+                        <tr><td>Initial inventory</td><td style="text-align:right;">$7,000</td></tr>
+                        <tr><td>Working capital (3 months)</td><td style="text-align:right;">$35,000</td></tr>
+                        <tr style="border-top:1px solid var(--yolk);"><td style="color:var(--cream);font-weight:500;">Total Investment</td><td style="text-align:right;" class="highlight"><strong>~$175,000</strong></td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:var(--element-gap);">
+                <div class="card" style="text-align:center;border-color:rgba(90,175,76,0.3);">
+                    <p style="font-size:var(--small-size);color:var(--green-good);font-weight:500;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.3rem;">Why So Low?</p>
+                    <p style="font-size:var(--small-size);">$750K kitchen already built and maintained. HVAC functional. All equipment in great shape. We bring art, plates, and menus.</p>
+                </div>
+                <div class="tag">30-45 Days to Open</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SLIDE 8: PROJECTED P&L
+     ============================================ -->
+<section class="slide bg-warm" id="slide-8">
+    <div class="ambient" style="width:350px;height:350px;background:var(--yolk);top:-100px;right:30%;"></div>
+    <div class="slide-content">
+        <div class="eyebrow reveal-item">Financial Projections</div>
+        <h2 class="reveal-item">Base Case <em class="yolk" style="font-style:italic;">P&L</em></h2>
+        <div class="gold-line reveal-item"></div>
+        <div class="split reveal-item" style="margin-top:var(--content-gap);">
+            <div>
+                <table>
+                    <thead><tr><th>Line Item</th><th style="text-align:right;">Monthly</th><th style="text-align:right;">% Rev</th></tr></thead>
+                    <tbody>
+                        <tr><td style="color:var(--cream);font-weight:500;">Net Sales</td><td style="text-align:right;" class="highlight">$79,200</td><td style="text-align:right;">100%</td></tr>
+                        <tr><td>COGS (Food, Bev & Supplies)</td><td style="text-align:right;">($25,344)</td><td style="text-align:right;">32%</td></tr>
+                        <tr><td>Labor (all-in)</td><td style="text-align:right;">($23,760)</td><td style="text-align:right;">30%</td></tr>
+                        <tr><td style="color:var(--cream);">Prime Cost</td><td style="text-align:right;">($49,104)</td><td style="text-align:right;" class="good">62%</td></tr>
+                        <tr><td>Rent + NNN</td><td style="text-align:right;">($10,318)</td><td style="text-align:right;">13%</td></tr>
+                        <tr><td>Other Operating</td><td style="text-align:right;">($7,128)</td><td style="text-align:right;">9%</td></tr>
+                        <tr style="border-top:1px solid var(--yolk);"><td style="color:var(--cream);font-weight:500;">EBITDA</td><td style="text-align:right;" class="highlight"><strong>$12,650</strong></td><td style="text-align:right;" class="good"><strong>16%</strong></td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:var(--element-gap);">
+                <div class="card" style="text-align:center;">
+                    <div class="stat-number" style="font-size:clamp(1.5rem,3vw,2.5rem);">$152K</div>
+                    <div class="stat-label">Annual EBITDA</div>
+                </div>
+                <div class="card" style="text-align:center;">
+                    <div class="stat-number" style="font-size:clamp(1.5rem,3vw,2.5rem);color:var(--green-good);">62%</div>
+                    <div class="stat-label">Prime Cost<br><span style="font-size:0.8em;">(Industry target: &lt;65%)</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SLIDE 9: ROI
+     ============================================ -->
+<section class="slide bg-deep" id="slide-9">
+    <div class="ambient" style="width:500px;height:500px;background:var(--yolk);bottom:-200px;left:-150px;"></div>
+    <div class="slide-content">
+        <div class="eyebrow reveal-item">Return on Investment</div>
+        <h2 class="reveal-item">Your Money Back in <em class="yolk" style="font-style:italic;">14 Months</em></h2>
+        <div class="gold-line reveal-item"></div>
+        <div class="grid grid-3 reveal-item" style="margin-top:var(--content-gap);">
+            <div class="card" style="text-align:center;">
+                <p style="font-size:var(--small-size);color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.5rem;">Conservative</p>
+                <div class="stat-number" style="font-size:clamp(1.3rem,2.5vw,2rem);">$68K</div>
+                <div class="stat-label">Annual EBITDA</div>
+                <div class="gold-line gold-line-center" style="width:40px;"></div>
+                <p style="font-size:var(--small-size);color:var(--cream);">39% ROI &bull; 31mo payback</p>
+            </div>
+            <div class="card" style="text-align:center;border-color:rgba(245,183,49,0.4);box-shadow:0 0 30px var(--yolk-glow);">
+                <div class="tag" style="margin-bottom:0.5rem;">Base Case</div>
+                <div class="stat-number" style="font-size:clamp(1.5rem,3vw,2.5rem);">$152K</div>
+                <div class="stat-label">Annual EBITDA</div>
+                <div class="gold-line gold-line-center" style="width:40px;"></div>
+                <p style="font-size:var(--small-size);color:var(--cream);font-weight:500;">87% ROI &bull; 14mo payback</p>
+            </div>
+            <div class="card" style="text-align:center;">
+                <p style="font-size:var(--small-size);color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.5rem;">Upside</p>
+                <div class="stat-number" style="font-size:clamp(1.3rem,2.5vw,2rem);color:var(--green-good);">$234K</div>
+                <div class="stat-label">Annual EBITDA</div>
+                <div class="gold-line gold-line-center" style="width:40px;"></div>
+                <p style="font-size:var(--small-size);color:var(--cream);">134% ROI &bull; 9mo payback</p>
+            </div>
+        </div>
+        <p class="reveal-item" style="text-align:center;margin-top:var(--element-gap);font-size:var(--small-size);color:var(--text-muted);">
+            Based on $175K total investment &bull; Revenue at $22/sf (below proven $23/sf) &bull; Uses actual COGS 32% and labor 30% from current operations
+        </p>
+    </div>
+</section>
+
+<!-- ============================================
+     SLIDE 10: LOCATION SCORE
+     ============================================ -->
+<section class="slide bg-warm" id="slide-10">
+    <div class="ambient" style="width:400px;height:400px;background:var(--yolk);top:-100px;left:-100px;"></div>
+    <div class="slide-content centered">
+        <div class="eyebrow reveal-item">Location Score</div>
+        <h2 class="reveal-item" style="margin-bottom:var(--content-gap);">Overall <em class="yolk" style="font-style:italic;">Assessment</em></h2>
+        <div class="split reveal-item">
+            <div style="display:flex;justify-content:center;">
+                <div class="score-ring">
+                    <div class="number">82</div>
+                    <div class="label">/ 100</div>
+                </div>
+            </div>
+            <div>
+                <table style="font-size:var(--small-size);">
+                    <thead><tr><th>Factor</th><th style="text-align:center;">Score</th></tr></thead>
+                    <tbody>
+                        <tr><td>Demographics & Market Fit</td><td style="text-align:center;" class="good">9/10</td></tr>
+                        <tr><td>Competitive Gap</td><td style="text-align:center;" class="good">9/10</td></tr>
+                        <tr><td>Physical Space & Kitchen</td><td style="text-align:center;" class="highlight">8/10</td></tr>
+                        <tr><td>Lease Economics</td><td style="text-align:center;" class="highlight">8/10</td></tr>
+                        <tr><td>Patio Advantage</td><td style="text-align:center;" class="good">9/10</td></tr>
+                        <tr><td>Traffic & Visibility</td><td style="text-align:center;" class="highlight">7/10</td></tr>
+                        <tr><td>Scalability</td><td style="text-align:center;" class="highlight">7/10</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="tag-green reveal-item" style="margin-top:var(--content-gap);display:inline-block;font-size:var(--body-size);padding:0.5rem 1.5rem;background:rgba(90,175,76,0.15);color:var(--green-good);border:1px solid rgba(90,175,76,0.3);border-radius:2px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;">
+            STRONG GO
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SLIDE 11: WHY THIS WORKS
+     ============================================ -->
+<section class="slide bg-deep" id="slide-11">
+    <div class="ambient" style="width:300px;height:300px;background:var(--yolk);bottom:-100px;right:10%;"></div>
+    <div class="slide-content">
+        <div class="eyebrow reveal-item">Why This Works</div>
+        <h2 class="reveal-item">8 Strategic <em class="yolk" style="font-style:italic;">Advantages</em></h2>
+        <div class="gold-line reveal-item"></div>
+        <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:var(--content-gap);">
+            <div class="reveal-item"><p style="font-size:var(--small-size);"><span class="yolk" style="font-weight:500;">1.</span> Proven $23/sf model across 2 locations — replication, not a gamble</p></div>
+            <div class="reveal-item"><p style="font-size:var(--small-size);"><span class="yolk" style="font-weight:500;">2.</span> Zero modern Hispanic-angle breakfast in all of Santa Clarita</p></div>
+            <div class="reveal-item"><p style="font-size:var(--small-size);"><span class="yolk" style="font-weight:500;">3.</span> 82% higher median income — customers pay more, tip better</p></div>
+            <div class="reveal-item"><p style="font-size:var(--small-size);"><span class="yolk" style="font-weight:500;">4.</span> $750K turnkey kitchen — investment goes to art and plates, not infrastructure</p></div>
+            <div class="reveal-item"><p style="font-size:var(--small-size);"><span class="yolk" style="font-weight:500;">5.</span> 2,000 sq ft patio — SoCal brunch destination neither Bakersfield location has</p></div>
+            <div class="reveal-item"><p style="font-size:var(--small-size);"><span class="yolk" style="font-weight:500;">6.</span> Landlord wants us — leverage for better terms and free rent during buildout</p></div>
+            <div class="reveal-item"><p style="font-size:var(--small-size);"><span class="yolk" style="font-weight:500;">7.</span> Owner lives in Santa Clarita — hands-on management, no commute</p></div>
+            <div class="reveal-item"><p style="font-size:var(--small-size);"><span class="yolk" style="font-weight:500;">8.</span> Beer & Wine license transfers — micheladas and mimosas from day one</p></div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================
+     SLIDE 12: CLOSING
+     ============================================ -->
+<section class="slide bg-gradient centered" id="slide-12">
+    <div class="ambient" style="width:500px;height:500px;background:var(--yolk);top:50%;left:50%;transform:translate(-50%,-50%);opacity:0.06;"></div>
+    <div class="slide-content centered">
+        <img src="assets/huevo-house-logo.png" alt="Huevo House Cafe logo" class="reveal-item" style="width:clamp(100px,18vw,180px);height:auto;margin:0 auto clamp(0.3rem,1vh,1rem);">
+        <h2 class="reveal-item" style="font-style:italic;color:var(--yolk);font-weight:300;">
+            Santa Clarita, CA
+        </h2>
+        <div class="reveal-item" style="display:flex;gap:clamp(1rem,3vw,3rem);justify-content:center;margin-top:var(--content-gap);">
+            <div class="stat">
+                <div class="stat-number" style="font-size:clamp(1.2rem,2.5vw,2rem);">$175K</div>
+                <div class="stat-label">Investment</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number" style="font-size:clamp(1.2rem,2.5vw,2rem);color:var(--green-good);">87%</div>
+                <div class="stat-label">Year 1 ROI</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number" style="font-size:clamp(1.2rem,2.5vw,2rem);">14mo</div>
+                <div class="stat-label">Payback</div>
+            </div>
+        </div>
+        <p class="reveal-item" style="margin-top:var(--content-gap);color:var(--text-muted);font-size:var(--small-size);">
+            Contact: Nav Gill &bull; buildwithnav@gmail.com
+        </p>
+    </div>
+</section>
+
+<!-- ============================================
+   JAVASCRIPT: Navigation + Reveals
+   ============================================ -->
+<script>
+(function() {
+    const slides = document.querySelectorAll('.slide');
+    const progress = document.getElementById('progress');
+    const counter = document.getElementById('slideCounter');
+    const total = slides.length;
+
+    /* Reveal on scroll */
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.querySelectorAll('.reveal-item').forEach(el => {
+                    el.classList.add('visible');
+                });
+            }
+        });
+    }, { threshold: 0.3 });
+
+    slides.forEach(s => observer.observe(s));
+
+    /* Progress + counter */
+    function updateProgress() {
+        const scrollTop = window.scrollY;
+        const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const pct = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+        progress.style.width = pct + '%';
+
+        const current = Math.round((scrollTop / scrollHeight) * (total - 1)) + 1;
+        counter.textContent = Math.min(current, total) + ' / ' + total;
+    }
+    window.addEventListener('scroll', updateProgress);
+    updateProgress();
+
+    /* Keyboard navigation */
+    document.addEventListener('keydown', (e) => {
+        const scrollTop = window.scrollY;
+        const vh = window.innerHeight;
+        const currentIndex = Math.round(scrollTop / vh);
+
+        if (e.key === 'ArrowDown' || e.key === ' ' || e.key === 'PageDown') {
+            e.preventDefault();
+            const next = Math.min(currentIndex + 1, total - 1);
+            slides[next].scrollIntoView({ behavior: 'smooth' });
+        }
+        if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+            e.preventDefault();
+            const prev = Math.max(currentIndex - 1, 0);
+            slides[prev].scrollIntoView({ behavior: 'smooth' });
+        }
+    });
+
+    /* Touch navigation */
+    let touchStartY = 0;
+    document.addEventListener('touchstart', (e) => { touchStartY = e.touches[0].clientY; });
+    document.addEventListener('touchend', (e) => {
+        const diff = touchStartY - e.changedTouches[0].clientY;
+        const scrollTop = window.scrollY;
+        const vh = window.innerHeight;
+        const currentIndex = Math.round(scrollTop / vh);
+
+        if (Math.abs(diff) > 50) {
+            if (diff > 0) {
+                const next = Math.min(currentIndex + 1, total - 1);
+                slides[next].scrollIntoView({ behavior: 'smooth' });
+            } else {
+                const prev = Math.max(currentIndex - 1, 0);
+                slides[prev].scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    });
+})();
+</script>
+
+</body>
+</html>
