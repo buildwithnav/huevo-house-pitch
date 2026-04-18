@@ -304,21 +304,13 @@ td.good { color: var(--green-good); font-weight: 500; }
     z-index: 999;
 }
 
-/* Reveal animations */
+/* Reveal animations — GSAP handles transforms, just set initial state */
 .reveal-item {
     opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.7s ease, transform 0.7s ease;
 }
-.reveal-item.visible {
-    opacity: 1;
-    transform: translateY(0);
+.gold-line {
+    transform-origin: center;
 }
-.reveal-item:nth-child(2) { transition-delay: 0.1s; }
-.reveal-item:nth-child(3) { transition-delay: 0.2s; }
-.reveal-item:nth-child(4) { transition-delay: 0.3s; }
-.reveal-item:nth-child(5) { transition-delay: 0.4s; }
-.reveal-item:nth-child(6) { transition-delay: 0.5s; }
 
 /* Centered content helper */
 .centered { text-align: center; align-items: center; }
@@ -800,85 +792,239 @@ td.good { color: var(--green-good); font-weight: 500; }
     </div>
 </section>
 
+<!-- GSAP CDN -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
+
 <!-- ============================================
-   JAVASCRIPT: Navigation + Reveals
+   JAVASCRIPT: GSAP Animations + Navigation
    ============================================ -->
 <script>
 (function() {
+    gsap.registerPlugin(ScrollTrigger);
+
     const slides = document.querySelectorAll('.slide');
     const progress = document.getElementById('progress');
     const counter = document.getElementById('slideCounter');
     const total = slides.length;
-    let currentSlide = 0;
-    let isScrolling = false;
 
-    /* Determine current slide from scroll position */
-    function getCurrentSlide() {
-        const vh = window.innerHeight;
-        return Math.round(window.scrollY / vh);
-    }
-
-    /* Navigate to a specific slide */
-    function goToSlide(index) {
-        if (index < 0 || index >= total || isScrolling) return;
-        isScrolling = true;
-        currentSlide = index;
-        slides[index].scrollIntoView({ behavior: 'smooth' });
-        setTimeout(() => { isScrolling = false; }, 600);
-    }
-
-    /* Reveal on scroll */
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.querySelectorAll('.reveal-item').forEach(el => {
-                    el.classList.add('visible');
-                });
-            }
-        });
-    }, { threshold: 0.2 });
-
-    slides.forEach(s => observer.observe(s));
-
-    /* Progress + counter */
-    function updateProgress() {
-        const scrollTop = window.scrollY;
-        const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
-        const pct = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
-        progress.style.width = pct + '%';
-
-        currentSlide = getCurrentSlide();
-        counter.textContent = Math.min(currentSlide + 1, total) + ' / ' + total;
-    }
-    window.addEventListener('scroll', updateProgress);
-    updateProgress();
-
-    /* Keyboard navigation */
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowDown' || e.key === ' ' || e.key === 'PageDown') {
-            e.preventDefault();
-            goToSlide(getCurrentSlide() + 1);
-        }
-        if (e.key === 'ArrowUp' || e.key === 'PageUp') {
-            e.preventDefault();
-            goToSlide(getCurrentSlide() - 1);
+    /* ---- Scroll progress bar ---- */
+    gsap.to(progress, {
+        width: '100%',
+        ease: 'none',
+        scrollTrigger: {
+            trigger: document.documentElement,
+            start: 'top top',
+            end: 'bottom bottom',
+            scrub: 0.3,
         }
     });
 
-    /* Touch navigation — swipe with lower threshold for mobile */
-    let touchStartY = 0;
-    let touchStartTime = 0;
+    /* ---- Per-slide GSAP reveals ---- */
+    slides.forEach((slide, i) => {
+        const items = slide.querySelectorAll('.reveal-item');
+        if (!items.length) return;
 
-    document.addEventListener('touchstart', (e) => {
-        touchStartY = e.touches[0].clientY;
-        touchStartTime = Date.now();
-    }, { passive: true });
+        /* Staggered fade-up entrance */
+        gsap.fromTo(items,
+            { y: 30, opacity: 0 },
+            {
+                y: 0,
+                opacity: 1,
+                duration: 0.7,
+                stagger: 0.12,
+                ease: 'power3.out',
+                scrollTrigger: {
+                    trigger: slide,
+                    start: 'top 70%',
+                    toggleActions: 'play none none none',
+                }
+            }
+        );
+    });
 
-    document.addEventListener('touchend', (e) => {
-        /* Let CSS scroll-snap handle touch scrolling naturally */
-    }, { passive: true });
+    /* ---- Stat number count-up ---- */
+    document.querySelectorAll('.stat-number').forEach(el => {
+        const text = el.textContent.trim();
+        const match = text.match(/^\$?([\d,.]+)(K|mo|%)?$/);
+        if (!match) return;
 
-    /* Mouse wheel — let CSS scroll-snap handle it naturally */
+        const target = parseFloat(match[1].replace(/,/g, ''));
+        const prefix = text.startsWith('$') ? '$' : '';
+        const suffix = match[2] || '';
+
+        ScrollTrigger.create({
+            trigger: el,
+            start: 'top 85%',
+            once: true,
+            onEnter: () => {
+                const proxy = { val: 0 };
+                gsap.to(proxy, {
+                    val: target,
+                    duration: 1.2,
+                    ease: 'power2.out',
+                    onUpdate() {
+                        const v = proxy.val;
+                        if (target >= 100) {
+                            el.textContent = prefix + Math.round(v).toLocaleString() + suffix;
+                        } else {
+                            el.textContent = prefix + Math.round(v) + suffix;
+                        }
+                    }
+                });
+            }
+        });
+    });
+
+    /* ---- Ambient circles float ---- */
+    document.querySelectorAll('.ambient').forEach(el => {
+        gsap.to(el, {
+            x: 'random(-20, 20)',
+            y: 'random(-20, 20)',
+            duration: 'random(4, 8)',
+            repeat: -1,
+            yoyo: true,
+            ease: 'sine.inOut',
+        });
+    });
+
+    /* ---- Gold lines draw in ---- */
+    document.querySelectorAll('.gold-line').forEach(el => {
+        gsap.fromTo(el,
+            { scaleX: 0 },
+            {
+                scaleX: 1,
+                duration: 0.8,
+                ease: 'power2.out',
+                scrollTrigger: {
+                    trigger: el,
+                    start: 'top 85%',
+                    toggleActions: 'play none none none',
+                }
+            }
+        );
+    });
+
+    /* ---- Cards slight lift on enter ---- */
+    document.querySelectorAll('.card').forEach(el => {
+        gsap.fromTo(el,
+            { y: 15, opacity: 0 },
+            {
+                y: 0,
+                opacity: 1,
+                duration: 0.6,
+                ease: 'power2.out',
+                scrollTrigger: {
+                    trigger: el,
+                    start: 'top 90%',
+                    toggleActions: 'play none none none',
+                }
+            }
+        );
+    });
+
+    /* ---- Table rows stagger in ---- */
+    document.querySelectorAll('table').forEach(table => {
+        const rows = table.querySelectorAll('tbody tr');
+        if (!rows.length) return;
+        gsap.fromTo(rows,
+            { x: -15, opacity: 0 },
+            {
+                x: 0,
+                opacity: 1,
+                duration: 0.4,
+                stagger: 0.06,
+                ease: 'power2.out',
+                scrollTrigger: {
+                    trigger: table,
+                    start: 'top 85%',
+                    toggleActions: 'play none none none',
+                }
+            }
+        );
+    });
+
+    /* ---- Score ring pulse ---- */
+    const scoreRing = document.querySelector('.score-ring');
+    if (scoreRing) {
+        ScrollTrigger.create({
+            trigger: scoreRing,
+            start: 'top 80%',
+            once: true,
+            onEnter: () => {
+                gsap.fromTo(scoreRing,
+                    { scale: 0.5, opacity: 0 },
+                    { scale: 1, opacity: 1, duration: 0.8, ease: 'back.out(1.5)' }
+                );
+                /* Count up score number */
+                const numEl = scoreRing.querySelector('.number');
+                if (numEl) {
+                    const proxy = { val: 0 };
+                    gsap.to(proxy, {
+                        val: 82,
+                        duration: 1.5,
+                        ease: 'power2.out',
+                        onUpdate() { numEl.textContent = Math.round(proxy.val); }
+                    });
+                }
+            }
+        });
+    }
+
+    /* ---- Photo grid stagger ---- */
+    const photoGrid = document.querySelector('#slide-4b .reveal-item[style*="grid"]');
+    if (photoGrid) {
+        const photos = photoGrid.children;
+        gsap.fromTo(photos,
+            { scale: 0.9, opacity: 0 },
+            {
+                scale: 1,
+                opacity: 1,
+                duration: 0.5,
+                stagger: 0.1,
+                ease: 'power2.out',
+                scrollTrigger: {
+                    trigger: photoGrid,
+                    start: 'top 80%',
+                    toggleActions: 'play none none none',
+                }
+            }
+        );
+    }
+
+    /* ---- Logo entrance on title slide ---- */
+    const logo = document.querySelector('#slide-1 img');
+    if (logo) {
+        gsap.fromTo(logo,
+            { scale: 0.6, opacity: 0, rotation: -5 },
+            { scale: 1, opacity: 1, rotation: 0, duration: 1, ease: 'back.out(1.2)', delay: 0.3 }
+        );
+    }
+
+    /* ---- Slide counter ---- */
+    function updateCounter() {
+        const vh = window.innerHeight;
+        const current = Math.round(window.scrollY / vh) + 1;
+        counter.textContent = Math.min(current, total) + ' / ' + total;
+    }
+    window.addEventListener('scroll', updateCounter);
+    updateCounter();
+
+    /* ---- Keyboard navigation ---- */
+    document.addEventListener('keydown', (e) => {
+        const vh = window.innerHeight;
+        const idx = Math.round(window.scrollY / vh);
+        if (e.key === 'ArrowDown' || e.key === ' ' || e.key === 'PageDown') {
+            e.preventDefault();
+            const next = Math.min(idx + 1, total - 1);
+            slides[next].scrollIntoView({ behavior: 'smooth' });
+        }
+        if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+            e.preventDefault();
+            const prev = Math.max(idx - 1, 0);
+            slides[prev].scrollIntoView({ behavior: 'smooth' });
+        }
+    });
 })();
 </script>
 
