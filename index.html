@@ -875,35 +875,10 @@ td.good { color: var(--green-good); font-weight: 500; }
     }, { passive: true });
 
     document.addEventListener('touchend', (e) => {
-        const diff = touchStartY - e.changedTouches[0].clientY;
-        const elapsed = Date.now() - touchStartTime;
+        /* Let CSS scroll-snap handle touch scrolling naturally */
+    }, { passive: true });
 
-        /* Only handle quick swipes (under 400ms), let natural scroll handle slow drags */
-        if (elapsed > 400) return;
-
-        if (Math.abs(diff) > 30) {
-            e.preventDefault();
-            if (diff > 0) {
-                goToSlide(getCurrentSlide() + 1);
-            } else {
-                goToSlide(getCurrentSlide() - 1);
-            }
-        }
-    }, { passive: false });
-
-    /* Mouse wheel — one slide per scroll event */
-    let wheelTimeout = null;
-    document.addEventListener('wheel', (e) => {
-        if (wheelTimeout) return;
-        e.preventDefault();
-        wheelTimeout = setTimeout(() => { wheelTimeout = null; }, 800);
-
-        if (e.deltaY > 0) {
-            goToSlide(getCurrentSlide() + 1);
-        } else {
-            goToSlide(getCurrentSlide() - 1);
-        }
-    }, { passive: false });
+    /* Mouse wheel — let CSS scroll-snap handle it naturally */
 })();
 </script>
 
