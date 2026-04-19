@@ -307,9 +307,15 @@ td.good { color: var(--green-good); font-weight: 500; }
 /* Reveal animations — GSAP handles transforms, just set initial state */
 .reveal-item {
     opacity: 0;
+    will-change: transform, opacity;
 }
 .gold-line {
     transform-origin: center;
+}
+
+/* Mobile Safari fix — force GPU compositing */
+@supports (-webkit-touch-callout: none) {
+    .slide { -webkit-transform: translateZ(0); }
 }
 
 /* Centered content helper */
@@ -992,7 +998,12 @@ td.good { color: var(--green-good); font-weight: 500; }
         );
     }
 
-    /* ---- Logo entrance on title slide ---- */
+    /* ---- Title slide — animate immediately on load, no scroll trigger ---- */
+    const titleItems = document.querySelectorAll('#slide-1 .reveal-item');
+    gsap.fromTo(titleItems,
+        { y: 30, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.8, stagger: 0.15, ease: 'power3.out', delay: 0.3 }
+    );
     const logo = document.querySelector('#slide-1 img');
     if (logo) {
         gsap.fromTo(logo,
@@ -1000,6 +1011,16 @@ td.good { color: var(--green-good); font-weight: 500; }
             { scale: 1, opacity: 1, rotation: 0, duration: 1, ease: 'back.out(1.2)', delay: 0.3 }
         );
     }
+
+    /* ---- Ensure second slide triggers early enough ---- */
+    const slide2Items = document.querySelectorAll('#slide-2 .reveal-item');
+    gsap.fromTo(slide2Items,
+        { y: 30, opacity: 0 },
+        {
+            y: 0, opacity: 1, duration: 0.7, stagger: 0.12, ease: 'power3.out',
+            scrollTrigger: { trigger: '#slide-2', start: 'top 95%', toggleActions: 'play none none none' }
+        }
+    );
 
     /* ---- Slide counter ---- */
     function updateCounter() {
