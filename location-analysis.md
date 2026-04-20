@@ -187,9 +187,11 @@ Kitchen, equipment, HVAC, and buildout are all functional and in great condition
 
 | Scenario | Annual EBITDA | Total Investment (mid ~$175K) | ROI | Payback |
 |----------|-------------|----------------------|-----|---------|
-| Conservative ($78K/mo) | $64,000 | $197,000 | 32% | 37 months |
-| **Base Case ($90K/mo)** | **$119,000** | **$197,000** | **60%** | **20 months** |
-| Upside ($110K/mo) | $270,000 | $197,000 | 137% | 9 months |
+| Conservative ($78K/mo) | $3,900 | $197,000 | 2% | Break-even |
+| **Base Case ($90K/mo)** | **$59,000** | **$197,000** | **30%** | **40 months** |
+| Upside ($110K/mo) | $210,000 | $197,000 | 107% | 11 months |
+
+*Net profit includes $5,000/mo owner salary, $5,000/mo marketing, utilities $4,500, insurance $1,500.*
 
 ---
 
