@@ -464,9 +464,9 @@ td.good { color: var(--green-good); font-weight: 500; }
                     <div class="stat-label">Instagram Followers</div>
                     <p style="font-size:var(--small-size);color:var(--text-muted);margin-top:0.3rem;">@huevohouse — 645+ posts</p>
                 </div>
-                <div class="card" style="text-align:center;width:100%;">
-                    <p style="font-size:var(--small-size);color:var(--cream);font-style:italic;">"Amazing food, amazing service, great music and prices."</p>
-                    <p style="font-size:var(--small-size);color:var(--text-muted);margin-top:0.3rem;">— Google Review</p>
+                <div class="card" style="text-align:center;width:100%;min-height:clamp(60px,8vh,90px);display:flex;flex-direction:column;justify-content:center;" id="review-card">
+                    <p style="font-size:var(--small-size);color:var(--cream);font-style:italic;" id="review-text">"Amazing food, amazing service, great music and prices."</p>
+                    <p style="font-size:var(--small-size);color:var(--text-muted);margin-top:0.3rem;" id="review-source">— Google Review</p>
                 </div>
             </div>
         </div>
@@ -1113,6 +1113,37 @@ td.good { color: var(--green-good); font-weight: 500; }
     }
     window.addEventListener('scroll', updateCounter);
     updateCounter();
+
+    /* ---- Rotating reviews ---- */
+    const reviews = [
+        { text: '"Amazing food, amazing service, great music and prices."', source: '— David Leon, Google' },
+        { text: '"The chilaquiles with birria are unforgettable. We drive 30 minutes just for these."', source: '— Google Review' },
+        { text: '"Our food came quickly and we didn\'t have to wait for any kind of service."', source: '— Susan Martinez, Google' },
+        { text: '"Great spot for brunch with family. The cowboy skillet is incredible."', source: '— Yelp Review' },
+        { text: '"The Menu offered a lot of variety in foods and drinks at a reasonable price."', source: '— Ana Leal, Google' },
+        { text: '"Best breakfast in Bakersfield. The Biscoff pancakes are next level."', source: '— Yelp Review' },
+        { text: '"Love the vibe, love the food, love the staff. This place gets it right."', source: '— Google Review' },
+        { text: '"Huge breakfast burritos and the mimosa flight is a must. Coming back every weekend."', source: '— Yelp Review' },
+    ];
+    let reviewIndex = 0;
+    const reviewText = document.getElementById('review-text');
+    const reviewSource = document.getElementById('review-source');
+    if (reviewText && reviewSource) {
+        setInterval(() => {
+            reviewIndex = (reviewIndex + 1) % reviews.length;
+            gsap.to([reviewText, reviewSource], {
+                opacity: 0, y: -8, duration: 0.3, ease: 'power2.in',
+                onComplete() {
+                    reviewText.textContent = reviews[reviewIndex].text;
+                    reviewSource.textContent = reviews[reviewIndex].source;
+                    gsap.fromTo([reviewText, reviewSource],
+                        { opacity: 0, y: 8 },
+                        { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' }
+                    );
+                }
+            });
+        }, 2000);
+    }
 
     /* ---- Keyboard navigation ---- */
     document.addEventListener('keydown', (e) => {
